@@ -10,6 +10,7 @@ import salesRoutes        from "./routes/sales.routes";
 import sanctionRoutes     from "./routes/sanction.routes";
 import disbursementRoutes from "./routes/disbursement.routes";
 import collectionRoutes   from "./routes/collection.routes";
+import adminRoutes        from "./routes/admin.routes";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/api/sales",        salesRoutes);
 app.use("/api/sanction",     sanctionRoutes);
 app.use("/api/disbursement", disbursementRoutes);
 app.use("/api/collection",   collectionRoutes);
+app.use("/api/admin",        adminRoutes);
 
 async function StartServer() {
   try {
