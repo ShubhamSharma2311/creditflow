@@ -2,13 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { Role } from "../models/User.model";
 
-// ── Extend Express Request to carry user payload ───────────────────────────
+
 
 export interface AuthRequest extends Request {
   user?: {
     id: string;
     role: Role;
   };
+  file?: Express.Multer.File;  
 }
 
 

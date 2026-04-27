@@ -3,7 +3,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import connectDB from "./db";
+import path from "path";
 import authRoutes from "./routes/auth.routes";
+import borrowerRoutes from "./routes/borrower.routes";
 
 dotenv.config();
 
@@ -20,8 +22,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Serve uploaded salary slips
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth",     authRoutes);
+app.use("/api/borrower", borrowerRoutes);
 
 async function StartServer(){
  try{
