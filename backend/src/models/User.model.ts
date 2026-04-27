@@ -1,7 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// ── Enums ──────────────────────────────────────────────────────────────────
-
 export enum Role {
   ADMIN        = "ADMIN",
   SALES        = "SALES",
@@ -17,14 +15,11 @@ export enum EmploymentMode {
   UNEMPLOYED    = "UNEMPLOYED",
 }
 
-// ── Interface ──────────────────────────────────────────────────────────────
-
 export interface IUser extends Document {
   name:           string;
   email:          string;
   password:       string;
   role:           Role;
-  // Borrower-only fields — null for executives / admin
   pan?:           string;
   dob?:           Date;
   monthlyIncome?: number;
@@ -33,8 +28,6 @@ export interface IUser extends Document {
   createdAt:      Date;
   updatedAt:      Date;
 }
-
-// ── Schema ─────────────────────────────────────────────────────────────────
 
 const UserSchema = new Schema<IUser>(
   {
@@ -51,6 +44,5 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-// ── Model ──────────────────────────────────────────────────────────────────
-
 export const User = mongoose.model<IUser>("User", UserSchema);
+

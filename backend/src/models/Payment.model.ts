@@ -1,18 +1,14 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// ── Interface ──────────────────────────────────────────────────────────────
-
 export interface IPayment extends Document {
-  loan:        mongoose.Types.ObjectId;  // ref → LoanApplication
-  recordedBy:  mongoose.Types.ObjectId;  // ref → User (Collection executive)
-  utrNumber:   string;                   // globally unique — no duplicates allowed
+  loan:        mongoose.Types.ObjectId; 
+  recordedBy:  mongoose.Types.ObjectId; 
+  utrNumber:   string;                  
   amount:      number;
   paymentDate: Date;
   createdAt:   Date;
   updatedAt:   Date;
 }
-
-// ── Schema ─────────────────────────────────────────────────────────────────
 
 const PaymentSchema = new Schema<IPayment>(
   {
@@ -24,7 +20,5 @@ const PaymentSchema = new Schema<IPayment>(
   },
   { timestamps: true }
 );
-
-// ── Model ──────────────────────────────────────────────────────────────────
 
 export const Payment = mongoose.model<IPayment>("Payment", PaymentSchema);
