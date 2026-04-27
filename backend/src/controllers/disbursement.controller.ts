@@ -2,9 +2,6 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { LoanApplication, LoanStatus } from "../models/LoanApplication.model";
 
-// GET /api/disbursement/loans
-// Returns all SANCTIONED loans ready to be disbursed
-
 export const getSanctionedLoans = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const loans = await LoanApplication.find({ status: LoanStatus.SANCTIONED })
@@ -17,9 +14,6 @@ export const getSanctionedLoans = async (req: AuthRequest, res: Response): Promi
     res.status(500).json({ message: "Server error", error });
   }
 };
-
-// PATCH /api/disbursement/loans/:id/disburse
-// SANCTIONED → DISBURSED
 
 export const disburseLoan = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -34,7 +28,7 @@ export const disburseLoan = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    loan.status     = LoanStatus.DISBURSED;
+    loan.status      = LoanStatus.DISBURSED;
     loan.disbursedBy = req.user?.id as any;
     await loan.save();
 

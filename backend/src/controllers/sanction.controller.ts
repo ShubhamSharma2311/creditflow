@@ -2,9 +2,6 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { LoanApplication, LoanStatus } from "../models/LoanApplication.model";
 
-// GET /api/sanction/loans
-// Returns all APPLIED loans for review
-
 export const getAppliedLoans = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const loans = await LoanApplication.find({ status: LoanStatus.APPLIED })
@@ -16,9 +13,6 @@ export const getAppliedLoans = async (req: AuthRequest, res: Response): Promise<
     res.status(500).json({ message: "Server error", error });
   }
 };
-
-// PATCH /api/sanction/loans/:id/approve
-// APPLIED → SANCTIONED
 
 export const approveLoan = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -33,7 +27,7 @@ export const approveLoan = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
-    loan.status      = LoanStatus.SANCTIONED;
+    loan.status       = LoanStatus.SANCTIONED;
     loan.sanctionedBy = req.user?.id as any;
     await loan.save();
 
@@ -42,9 +36,6 @@ export const approveLoan = async (req: AuthRequest, res: Response): Promise<void
     res.status(500).json({ message: "Server error", error });
   }
 };
-
-// PATCH /api/sanction/loans/:id/reject
-// APPLIED → REJECTED (requires a reason)
 
 export const rejectLoan = async (req: AuthRequest, res: Response): Promise<void> => {
   try {

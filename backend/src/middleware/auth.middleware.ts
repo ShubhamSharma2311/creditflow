@@ -2,17 +2,13 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { Role } from "../models/User.model";
 
-
-
 export interface AuthRequest extends Request {
   user?: {
     id: string;
     role: Role;
   };
-  file?: Express.Multer.File;  
+  file?: Express.Multer.File;
 }
-
-
 
 export const verifyToken = (
   req: AuthRequest,
@@ -34,7 +30,7 @@ export const verifyToken = (
   } catch {
     res.status(401).json({ message: "Unauthorized, invalid or expired token" });
   }
-};  
+};
 
 export const authorizeRoles = (...roles: Role[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction): void => {

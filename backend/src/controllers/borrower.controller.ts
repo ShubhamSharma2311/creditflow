@@ -3,7 +3,6 @@ import { AuthRequest } from "../middleware/auth.middleware";
 import { User, EmploymentMode } from "../models/User.model";
 import { LoanApplication, LoanStatus } from "../models/LoanApplication.model";
 
-
 function isValidPAN(pan: string): boolean {
   if (pan.length !== 10) return false;
 
@@ -13,11 +12,9 @@ function isValidPAN(pan: string): boolean {
   for (let i = 0; i < 5; i++) {
     if (!letters.includes(pan[i])) return false;
   }
-
   for (let i = 5; i < 9; i++) {
     if (!digits.includes(pan[i])) return false;
   }
-  // Last 1 must be uppercase letter
   if (!letters.includes(pan[9])) return false;
 
   return true;
@@ -25,7 +22,7 @@ function isValidPAN(pan: string): boolean {
 
 interface BREInput {
   pan: string;
-  dob: string;          // ISO date string
+  dob: string;
   monthlyIncome: number;
   employmentMode: EmploymentMode;
 }
@@ -36,12 +33,10 @@ interface BREResult {
 }
 
 function runBRE({ pan, dob, monthlyIncome, employmentMode }: BREInput): BREResult {
-  // 1. PAN format check
   if (!isValidPAN(pan.toUpperCase())) {
     return { passed: false, reason: "Invalid PAN format. Expected format: ABCDE1234F" };
   }
 
-  // 2. Age check — must be between 23 and 50
   const birthDate = new Date(dob);
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
@@ -53,12 +48,10 @@ function runBRE({ pan, dob, monthlyIncome, employmentMode }: BREInput): BREResul
     return { passed: false, reason: `Age must be between 23 and 50. Your age: ${age}` };
   }
 
-  // 3. Salary check — minimum ₹25,000/month
   if (monthlyIncome < 25000) {
     return { passed: false, reason: "Monthly income must be at least ₹25,000" };
   }
 
-  // 4. Employment check — unemployed applicants are rejected
   if (employmentMode === EmploymentMode.UNEMPLOYED) {
     return { passed: false, reason: "Unemployed applicants are not eligible for a loan" };
   }
@@ -66,12 +59,7 @@ function runBRE({ pan, dob, monthlyIncome, employmentMode }: BREInput): BREResul
   return { passed: true };
 }
 
-
-
-export const savePersonalDetails = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
+export const savePersonalDetails = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { pan, dob, monthlyIncome, employmentMode } = req.body;
 
@@ -88,14 +76,10 @@ export const savePersonalDetails = async (
     });
 
     if (!breResult.passed) {
-      res.status(422).json({
-        message: "Eligibility check failed",
-        reason: breResult.reason,
-      });
+      res.status(422).json({ message: "Eligibility check failed", reason: breResult.reason });
       return;
     }
 
-    // Save to user profile
     await User.findByIdAndUpdate(req.user?.id, {
       pan: pan.toUpperCase(),
       dob: new Date(dob),
@@ -109,12 +93,7 @@ export const savePersonalDetails = async (
   }
 };
 
-
-
-export const uploadSalarySlip = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
+export const uploadSalarySlip = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (!req.file) {
       res.status(400).json({ message: "Salary slip file is required" });
@@ -122,24 +101,15 @@ export const uploadSalarySlip = async (
     }
 
     const salarySlipUrl = `/uploads/${req.file.filename}`;
-
     await User.findByIdAndUpdate(req.user?.id, { salarySlipUrl });
 
-    res.status(200).json({
-      message: "Salary slip uploaded successfully",
-      salarySlipUrl,
-    });
+    res.status(200).json({ message: "Salary slip uploaded successfully", salarySlipUrl });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 };
 
-
-
-export const applyLoan = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
+export const applyLoan = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { loanAmount, tenure } = req.body;
 
@@ -149,9 +119,8 @@ export const applyLoan = async (
     }
 
     const amount = Number(loanAmount);
-    const days = Number(tenure);
+    const days   = Number(tenure);
 
-    // Validate ranges per assignment
     if (amount < 50000 || amount > 500000) {
       res.status(400).json({ message: "Loan amount must be between ₹50,000 and ₹5,00,000" });
       return;
@@ -161,7 +130,6 @@ export const applyLoan = async (
       return;
     }
 
-    
     const borrower = await User.findById(req.user?.id);
     if (!borrower) {
       res.status(404).json({ message: "User not found" });
@@ -173,7 +141,6 @@ export const applyLoan = async (
       return;
     }
 
-   
     const existingLoan = await LoanApplication.findOne({
       borrower: borrower._id,
       status: { $in: [LoanStatus.APPLIED, LoanStatus.SANCTIONED, LoanStatus.DISBURSED] },
@@ -183,10 +150,9 @@ export const applyLoan = async (
       return;
     }
 
-    
-    const interestRate = 12;
-    const simpleInterest = (amount * interestRate * days) / (365 * 100);
-    const totalRepayment = amount + simpleInterest;
+    const interestRate    = 12;
+    const simpleInterest  = (amount * interestRate * days) / (365 * 100);
+    const totalRepayment  = amount + simpleInterest;
 
     const loan = await LoanApplication.create({
       borrower:           borrower._id,
@@ -204,26 +170,15 @@ export const applyLoan = async (
       status:             LoanStatus.APPLIED,
     });
 
-    res.status(201).json({
-      message: "Loan application submitted successfully",
-      loan,
-    });
+    res.status(201).json({ message: "Loan application submitted successfully", loan });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 };
 
-
-
-export const getMyLoans = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
+export const getMyLoans = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const loans = await LoanApplication.find({ borrower: req.user?.id }).sort({
-      createdAt: -1,
-    });
-
+    const loans = await LoanApplication.find({ borrower: req.user?.id }).sort({ createdAt: -1 });
     res.status(200).json({ loans });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
