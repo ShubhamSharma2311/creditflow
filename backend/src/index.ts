@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import connectDB from "./db";
+import authRoutes from "./routes/auth.routes";
 
 dotenv.config();
 
@@ -18,6 +19,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Routes
+app.use("/api/auth", authRoutes);
 
 async function StartServer(){
  try{
