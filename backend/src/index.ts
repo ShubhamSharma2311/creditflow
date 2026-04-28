@@ -11,6 +11,7 @@ import sanctionRoutes     from "./routes/sanction.routes";
 import disbursementRoutes from "./routes/disbursement.routes";
 import collectionRoutes   from "./routes/collection.routes";
 import adminRoutes        from "./routes/admin.routes";
+import { setupSwagger }   from "./swagger";
 
 dotenv.config();
 
@@ -35,6 +36,8 @@ app.use("/api/disbursement", disbursementRoutes);
 app.use("/api/collection",   collectionRoutes);
 app.use("/api/admin",        adminRoutes);
 
+setupSwagger(app);
+
 async function StartServer() {
   try {
     await connectDB();
@@ -42,8 +45,8 @@ async function StartServer() {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error("Server failed to start:", error);
-    return;
+    console.error("Failed to start server:", error);
+    process.exit(1);
   }
 }
 
