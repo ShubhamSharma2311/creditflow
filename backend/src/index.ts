@@ -15,7 +15,8 @@ import { setupSwagger }   from "./swagger";
 
 dotenv.config();
 
-const app = express();
+const app = express(); // trigger restart
+
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
