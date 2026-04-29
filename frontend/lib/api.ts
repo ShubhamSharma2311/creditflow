@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://creditflow-zknl.onrender.com";
+const ENV_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://creditflow-zknl.onrender.com";
+const BACKEND_URL = ENV_URL.replace(/\/$/, "");
 
 const api = axios.create({
   baseURL: `${BACKEND_URL}/api`,
