@@ -123,7 +123,8 @@ export default function MyLoansPage() {
   const displayDob = user?.dob || (loans.length > 0 ? loans[0]?.dob : "");
   
   const rawSlip = user?.salarySlipUrl || (loans.length > 0 ? loans[0]?.salarySlipUrl : "");
-  const displaySlip = rawSlip?.startsWith('http') ? rawSlip : `http://localhost:5000${rawSlip}`;
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  const displaySlip = rawSlip?.startsWith('http') ? rawSlip : `${backendUrl}${rawSlip}`;
 
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(135deg, #FDF6ED 0%, #FEF0E6 100%)" }}>
