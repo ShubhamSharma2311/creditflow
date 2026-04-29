@@ -1,6 +1,6 @@
 # CreditSea Loan Management System
 
-Hosted Application: [Insert Hosted Link Here]
+Hosted Application: https://creditflow-sandy.vercel.app/
 
 ## Project Overview
 
