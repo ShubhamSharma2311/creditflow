@@ -11,6 +11,8 @@ The system is built using a modern technology stack:
 - Backend: Node.js, Express, TypeScript
 - Database: MongoDB
 
+**API Documentation:** [https://creditflow-zknl.onrender.com/api-docs](https://creditflow-zknl.onrender.com/api-docs)
+
 ## Folder Structure
 
 The repository is structured into two main directories: frontend and backend.
