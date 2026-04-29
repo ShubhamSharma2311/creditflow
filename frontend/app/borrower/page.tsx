@@ -297,7 +297,7 @@ export default function BorrowerPortal() {
                 </div>
 
                 {/* Right Side: Calculation Summary */}
-                <div style={{ background: "#FEF0E6", border: "1px solid #E8DDD0", borderRadius: "16px", padding: "20px 24px", display: "flex", flexDirection: "col", justifyContent: "space-between" }} className="flex flex-col gap-4">
+                <div style={{ background: "#FEF0E6", border: "1px solid #E8DDD0", borderRadius: "16px", padding: "20px 24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }} className="flex flex-col gap-4">
                   <div>
                     <h3 style={{ fontSize: "13px", fontWeight: 700, color: "#C8521A", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "16px" }}>Repayment Summary</h3>
                     

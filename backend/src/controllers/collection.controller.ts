@@ -47,9 +47,40 @@ export const recordPayment = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    if (paymentAmount > loan.outstandingBalance) {
+    // --- Early Repayment Logic ---
+    // Calculate days elapsed since the loan was created (proxy for disbursement date)
+    const paymentDateObj = new Date(paymentDate);
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const daysElapsed = Math.max(1, Math.ceil((paymentDateObj.getTime() - new Date(loan.createdAt).getTime()) / msPerDay));
+    
+    // Calculate actual interest accrued up to this payment date
+    // Daily interest = (Principal * Rate) / (100 * 365)
+    const actualInterest = (loan.loanAmount * loan.interestRate * Math.min(daysElapsed, loan.tenure)) / (100 * 365);
+    
+    // The amount required to completely close the loan TODAY
+    const earlyPayoffAmount = Math.max(0, (loan.loanAmount + actualInterest) - loan.amountPaid);
+
+    let finalPaymentAmount = paymentAmount;
+    let isClosingEarly = false;
+    let waivedInterest = 0;
+
+    // Check if the user is paying enough to close the loan early
+    if (daysElapsed < loan.tenure && paymentAmount >= earlyPayoffAmount) {
+      // User is closing early! We only charge the earlyPayoffAmount.
+      finalPaymentAmount = earlyPayoffAmount;
+      isClosingEarly = true;
+      
+      // Calculate how much interest we are waiving
+      waivedInterest = loan.simpleInterest - actualInterest;
+      
+      // Adjust the total repayment expectation downwards so books balance
+      loan.totalRepayment -= waivedInterest;
+      loan.simpleInterest = actualInterest;
+    }
+
+    if (finalPaymentAmount > loan.outstandingBalance) {
       res.status(400).json({
-        message: `Payment amount (₹${paymentAmount}) exceeds outstanding balance (₹${loan.outstandingBalance})`,
+        message: `Payment amount (₹${finalPaymentAmount}) exceeds outstanding balance (₹${loan.outstandingBalance})`,
       });
       return;
     }
@@ -58,14 +89,14 @@ export const recordPayment = async (req: AuthRequest, res: Response): Promise<vo
       loan:        loan._id,
       recordedBy:  req.user?.id,
       utrNumber,
-      amount:      paymentAmount,
-      paymentDate: new Date(paymentDate),
+      amount:      finalPaymentAmount,
+      paymentDate: paymentDateObj,
     });
 
-    loan.amountPaid         = parseFloat((loan.amountPaid + paymentAmount).toFixed(2));
-    loan.outstandingBalance = parseFloat((loan.outstandingBalance - paymentAmount).toFixed(2));
+    loan.amountPaid         = parseFloat((loan.amountPaid + finalPaymentAmount).toFixed(2));
+    loan.outstandingBalance = parseFloat((loan.totalRepayment - loan.amountPaid).toFixed(2));
 
-    if (loan.outstandingBalance <= 0) {
+    if (loan.outstandingBalance <= 0 || isClosingEarly) {
       loan.status             = LoanStatus.CLOSED;
       loan.outstandingBalance = 0;
     }
