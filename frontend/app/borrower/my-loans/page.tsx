@@ -123,7 +123,7 @@ export default function MyLoansPage() {
   const displayDob = user?.dob || (loans.length > 0 ? loans[0]?.dob : "");
   
   const rawSlip = user?.salarySlipUrl || (loans.length > 0 ? loans[0]?.salarySlipUrl : "");
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://creditflow-zknl.onrender.com";
   const displaySlip = rawSlip?.startsWith('http') ? rawSlip : `${backendUrl}${rawSlip}`;
 
   return (
